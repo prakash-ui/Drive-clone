@@ -29,7 +29,7 @@ Storage: supabase / alternative to firebase
 🎯 Ideal Use Case
 This project is perfect for learning full-stack development with the MERN stack. It also serves as a portfolio project showcasing authentication, file storage, and cloud functionality.
 
-![img alt](Screenshot 2025-02-04 180429.png)
+![img alt](https://github.com/prakash-ui/Drive-clone/blob/main/Screenshot%202025-02-04%20180429.png?raw=true)
 ![img alt](Screenshot 2025-02-04 180447.png)
 ![img alt](Screenshot 2025-02-04 180511.png)
 ![img alt](Screenshot 2025-02-04 180524.png)
