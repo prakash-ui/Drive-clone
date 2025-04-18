@@ -1,7 +1,7 @@
 [build]
-  base = "my-frontend"  # Points to frontend subdirectory
-  command = "cd my-frontend && npm install && npm run build"
-  publish = "my-frontend/dist"  # Vite's output folder
+  base = "my-frontend"  # Netlify will automatically cd here
+  command = "npm install && npm run build"  # Remove the cd command
+  publish = "dist"  # Relative to base directory
 
 [[redirects]]
   from = "/*"
