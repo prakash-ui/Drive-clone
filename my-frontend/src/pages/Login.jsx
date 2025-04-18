@@ -3,6 +3,7 @@ import { useState } from 'react';
 export default function Login() {
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
+  const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:3000';
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -11,7 +12,7 @@ export default function Login() {
 
     const form = new FormData(e.target);
     try {
-      const res = await fetch('http://localhost:3000/login', {
+      const res = await await fetch(`${API_URL}/login`, {
         method: 'POST',
         body: form,
         credentials: 'include',
