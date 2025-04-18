@@ -1,0 +1,9 @@
+[build]
+  base = "my-frontend"  # Points to frontend subdirectory
+  command = "cd my-frontend && npm install && npm run build"
+  publish = "my-frontend/dist"  # Vite's output folder
+
+[[redirects]]
+  from = "/*"
+  to = "/index.html"
+  status = 200
