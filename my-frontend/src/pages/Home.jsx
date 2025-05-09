@@ -13,7 +13,7 @@ export default function Home() {
     // Check if the user is authenticated
     const checkAuth = async () => {
       try {
-        const res = await fetch(`${API_URL}/home`, {
+        const res = await fetch(`${API_URL}/api/users/check-auth`, {
           method: 'GET',
           credentials: 'include',
         });
@@ -86,7 +86,7 @@ export default function Home() {
     formData.append('file', selectedFile);
 
     try {
-      const res = await fetch(`${API_URL}/upload-file`, {
+      const res = await fetch(`${API_URL}/api/files/upload`, {
         method: 'POST',
         body: formData,
         credentials: 'include',

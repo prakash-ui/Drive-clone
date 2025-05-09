@@ -1,36 +1,57 @@
 const express = require('express');
 const { upload, uploadToSupabase } = require('../config/multer.config');
 const authMiddleware = require('../middlewares/auth');
+const winston = require('winston');
+const rateLimit = require('express-rate-limit');
 
 const router = express.Router();
 
-// GET Home (Protected route for authenticated users)
+// Logger setup
+const logger = winston.createLogger({
+  level: 'info',
+  format: winston.format.combine(
+    winston.format.timestamp(),
+    winston.format.json()
+  ),
+  transports: [
+    new winston.transports.File({ filename: 'error.log', level: 'error' }),
+    new winston.transports.File({ filename: 'combined.log' }),
+  ],
+});
+
+if (process.env.NODE_ENV !== 'production') {
+  logger.add(new winston.transports.Console({ format: winston.format.simple() }));
+}
+
+// Rate limiter for file uploads
+const uploadLimiter = rateLimit({
+  windowMs: 15 * 60 * 1000, // 15 minutes
+  max: 10, // Limit to 10 uploads per window
+});
+
+// GET Home (Protected route)
 router.get('/home', authMiddleware, (req, res) => {
-  res.status(200).json({ message: 'Welcome to the homepage', user: req.user });
+  res.status(200).json({ 
+    message: 'Welcome to the homepage', 
+    user: {
+      userId: req.user.userId,
+      username: req.user.username
+    }
+  });
 });
 
 // POST Upload File (Protected route)
-router.post('/upload-file', authMiddleware, upload.single('file'), async (req, res) => {
+router.post('/files/upload', authMiddleware, uploadLimiter, upload.single('file'), (req, res) => {
   if (!req.file) {
     return res.status(400).json({ error: 'No file uploaded' });
   }
 
-  try {
-    const result = await uploadToSupabase(req.file);
-
-    if (!result) {
-      return res.status(400).json({ error: 'Failed to upload file to storage' });
-    }
-
-    res.status(200).json({
-      message: 'File uploaded successfully',
-      filePath: result.filePath,
-      fileURL: result.publicURL
-    });
-  } catch (error) {
-    console.error('Upload error:', error);
-    res.status(500).json({ error: `Server error: ${error.message || 'Unknown error during upload'}` });
-  }
+  logger.info(`File uploaded by user ${req.user.userId}: ${req.file.filename}`);
+  
+  res.status(200).json({
+    message: 'File uploaded successfully',
+    filePath: `/uploads/${req.file.filename}`
+  });
 });
 
 module.exports = router;

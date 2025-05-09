@@ -4,31 +4,40 @@ export default function Register() {
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
 
-  const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:3000';
+  const API_URL = import.meta.env.VITE_API_URL ||'http://localhost:3000';
 
   const handleSubmit = async (e) => {
     e.preventDefault();
     setError('');
     setLoading(true);
-
-    const form = new FormData(e.target);
+  
+    const formData = {
+      username: e.target.username.value,
+      email: e.target.email.value,
+      password: e.target.password.value
+    };
+  
     try {
-      const res = await fetch(`${API_URL}/register`, {
+      const res = await fetch(`${API_URL}/api/users/register`, {
         method: 'POST',
-        body: form,
-        credentials: 'include',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(formData),
+        credentials: 'include'
       });
-
+  
+      const data = await res.json();
+      
       if (res.ok) {
         alert('Registration successful!');
         window.location.href = '/login';
       } else {
-        const data = await res.json();
-        setError(data.message || 'Registration failed');
-        e.target.reset(); // Reset form on error
+        // Handle your backend's error format
+        setError(data.errors?.[0]?.msg || data.message || 'Registration failed');
       }
     } catch (err) {
-      setError('Server error. Please check if the backend is running.');
+      setError('Network error. Is the backend running?');
     } finally {
       setLoading(false);
     }

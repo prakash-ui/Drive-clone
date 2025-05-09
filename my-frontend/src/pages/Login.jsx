@@ -3,29 +3,38 @@ import { useState } from 'react';
 export default function Login() {
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
-  const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:3000';
+  const API_URL = import.meta.env.VITE_API_URL ||'http://localhost:3000';
 
   const handleSubmit = async (e) => {
     e.preventDefault();
     setError('');
     setLoading(true);
-
-    const form = new FormData(e.target);
+  
+    const loginData = {
+      username: e.target.username.value,
+      password: e.target.password.value
+    };
+  
     try {
-      const res = await await fetch(`${API_URL}/login`, {
+      const res = await fetch(`${API_URL}/api/users/login`, {
         method: 'POST',
-        body: form,
-        credentials: 'include',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(loginData),
+        credentials: 'include'
       });
-
+  
+      const data = await res.json();
+  
       if (res.ok) {
         window.location.href = '/';
       } else {
-        const data = await res.json();
-        setError(data.message || 'Login failed');
+        // Match your backend's error response format
+        setError(data.errors?.[0]?.msg || data.message || 'Login failed');
       }
     } catch (err) {
-      setError('Server error');
+      setError('Network error. Is the backend running?');
     } finally {
       setLoading(false);
     }

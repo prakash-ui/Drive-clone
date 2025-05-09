@@ -1,55 +1,42 @@
 const multer = require('multer');
-const { createClient } = require('@supabase/supabase-js');
+const supabase = require('./supabase.config');
 
-const supabase = createClient(
-  process.env.SUPABASE_URL,
-  process.env.SUPABASE_SERVICE_ROLE_KEY
-);
+// Store file in memory buffer
+const storage = multer.memoryStorage();
+const upload = multer({ storage: storage });
 
-const upload = multer({
-  storage: multer.memoryStorage(),
-  limits: { fileSize: 5 * 1024 * 1024 }, // 5MB limit
-  fileFilter: (req, file, cb) => {
-    const validTypes = ['image/png', 'image/jpeg', 'image/gif', 'image/svg+xml'];
-    if (validTypes.includes(file.mimetype)) {
-      cb(null, true);
-    } else {
-      cb(new Error('Invalid file type. Only PNG, JPG, GIF, SVG allowed.'));
+async function uploadToSupabase(file) {
+    try {
+        const bucket = process.env.SUPABASE_STORAGE_BUCKET;
+
+        if (!bucket) {
+            console.error("❌ Supabase bucket name is missing in .env");
+            return null;
+        }
+
+        const filePath = `uploads/${Date.now()}_${file.originalname}`;
+        
+        // ✅ Upload file to Supabase storage
+        const { data, error } = await supabase.storage
+            .from(bucket)
+            .upload(filePath, file.buffer, {
+                cacheControl: '3600',
+                upsert: false, 
+                contentType: file.mimetype // Ensure correct file type
+            });
+
+        if (error) throw error;
+
+        // ✅ Get the public URL of the uploaded file
+        const { publicURL } = supabase.storage.from(bucket).getPublicUrl(filePath);
+
+        console.log('✅ File uploaded successfully:', publicURL);
+        
+        return { filePath, publicURL };
+    } catch (err) {
+        console.error('❌ Upload error:', err.message);
+        return null;
     }
-  },
-});
-
-const uploadToSupabase = async (file) => {
-  try {
-    const fileExtension = file.originalname.split('.').pop();
-    const fileName = `${Date.now()}_${Math.random().toString(36).substring(2, 15)}.${fileExtension}`;
-    const filePath = `uploads/${fileName}`;
-
-    const { data, error } = await supabase.storage
-      .from(process.env.SUPABASE_STORAGE_BUCKET)
-      .upload(filePath, file.buffer, {
-        contentType: file.mimetype,
-      });
-
-    if (error) {
-      console.error('Supabase upload error:', error);
-      throw new Error(`Supabase upload failed: ${error.message}`);
-    }
-
-    const { publicUrl } = supabase.storage
-      .from(process.env.SUPABASE_STORAGE_BUCKET)
-      .getPublicUrl(filePath).data;
-
-    if (!publicUrl) {
-      console.error('Supabase public URL error: No public URL returned');
-      throw new Error('Failed to generate public URL');
-    }
-
-    return { filePath, publicURL: publicUrl };
-  } catch (error) {
-    console.error('uploadToSupabase error:', error);
-    throw error; // Re-throw to be caught in index.router.js
-  }
-};
+}
 
 module.exports = { upload, uploadToSupabase };
