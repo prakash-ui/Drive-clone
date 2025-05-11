@@ -21,3 +21,5 @@
 {"level":"info","message":"::1 - - [11/May/2025:13:03:15 +0000] \"POST /api/users/login HTTP/1.1\" 200 30 \"http://localhost:5173/\" \"Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/136.0.0.0 Safari/537.36\"","timestamp":"2025-05-11T13:03:15.397Z"}
 {"level":"info","message":"::1 - - [11/May/2025:13:03:15 +0000] \"GET /api/users/check-auth HTTP/1.1\" 200 110 \"http://localhost:5173/\" \"Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/136.0.0.0 Safari/537.36\"","timestamp":"2025-05-11T13:03:15.496Z"}
 {"level":"info","message":"::1 - - [11/May/2025:13:03:15 +0000] \"GET /api/users/check-auth HTTP/1.1\" 304 - \"http://localhost:5173/\" \"Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/136.0.0.0 Safari/537.36\"","timestamp":"2025-05-11T13:03:15.505Z"}
+{"level":"info","message":"Server is running on port 3000","timestamp":"2025-05-11T17:15:47.695Z"}
+{"level":"info","message":"Database connected successfully","timestamp":"2025-05-11T17:15:47.698Z"}

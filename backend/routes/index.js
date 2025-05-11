@@ -23,6 +23,11 @@ if (process.env.NODE_ENV !== 'production') {
   logger.add(new winston.transports.Console({ format: winston.format.simple() }));
 }
 
+// Base API route
+router.get('/', (req, res) => {
+  res.json({ message: "API is working!" });
+});
+
 // Rate limiter for file uploads
 const uploadLimiter = rateLimit({
   windowMs: 15 * 60 * 1000, // 15 minutes

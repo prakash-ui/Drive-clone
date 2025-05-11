@@ -41,6 +41,11 @@ router.get('/check-auth', auth, (req, res) => {
   });
 });
 
+// Add this to handle /api/users
+router.get('/', (req, res) => {
+  res.json({ message: "Users endpoint working!" });
+});
+
 // POST Register User
 router.post(
   '/register',

@@ -1,8 +1,8 @@
 const express = require('express');
 const dotenv = require('dotenv');
 dotenv.config();
-const userRouter = require('./routes/user.routes');
-const indexRouter = require('./routes/index.router');
+const userRouter = require('./routes/users');
+const indexRouter = require('./routes/index');
 const cors = require('cors');
 const helmet = require('helmet');
 const compression = require('compression');
@@ -76,17 +76,28 @@ app.use(
 
 // CORS configuration
 const allowedOrigins = [
-  process.env.VITE_FRONTEND_URL || 'http://localhost:5173' // Only allow local frontend
+  'http://localhost:5173', // Your Vite dev server
+  'https://drive-clone-c0af.onrender.com' // Production frontend
 ];
 
-app.use(
-  cors({
-    origin: allowedOrigins,
-    credentials: true,
-  })
-);
+app.use(cors({
+  origin: function (origin, callback) {
+    // Allow requests with no origin (like mobile apps or curl requests)
+    if (!origin || allowedOrigins.includes(origin)) {
+      callback(null, true);
+    } else {
+      callback(new Error('Not allowed by CORS'));
+    }
+  },
+  credentials: true,
+  methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
+  allowedHeaders: ['Content-Type', 'Authorization'],
+  optionsSuccessStatus: 200, // For legacy browser
+}));
 
-// Request logging
+app.options('*', cors());
+
+//Request logging
 app.use(morgan('combined', { stream: { write: (message) => logger.info(message.trim()) } }));
 
 // Middleware
