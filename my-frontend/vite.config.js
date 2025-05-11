@@ -10,7 +10,7 @@ export default defineConfig(({ command }) => ({
 
   // Production build settings
   build: {
-    outDir: '../backend/public', // Output to backend's public folder
+    outDir: './dist', // Output to backend's public folder
     emptyOutDir: true,
     sourcemap: true // Helpful for debugging
   },
