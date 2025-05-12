@@ -77,7 +77,8 @@ app.use(
 // CORS configuration
 const allowedOrigins = [
   'http://localhost:5173', // Your Vite dev server
-  'https://drive-clone-c0af.onrender.com' // Production frontend
+  'https://drive-clone-c0af.onrender.com',
+  'https://drive-clone-1-lmus.onrender.com' // Production frontend
 ];
 
 app.use(cors({
@@ -107,11 +108,16 @@ app.use(cookieParser());
 app.set('view engine', 'ejs');
 
 // Secure cookies in production
-if (process.env.VITE_FRONTEND_URL === 'production') {
+if (process.env.NODE_ENV === 'production') {
   app.set('trust proxy', 1); // Trust first proxy
 }
 app.get('/api/healthcheck', (req, res) => {
-  res.json({ status: 'ok', environment: process.env.VITE_FRONTEND_URL });
+  res.json({ 
+    status: 'ok',
+    environment: process.env.NODE_ENV,
+    timestamp: new Date().toISOString(),
+    dbStatus: mongoose.connection.readyState === 1 ? 'connected' : 'disconnected'
+  });
 });
 // Routes
 app.use('/api', indexRouter); // Prefix to avoid conflicts

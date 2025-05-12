@@ -133,12 +133,12 @@ router.post(
         { expiresIn: '1h' }
       );
 
-      res.cookie('token', token, {
-        httpOnly: true,
-        secure: process.env.NODE_ENV === 'production',
-        sameSite: 'Strict', // Stricter for security
-        maxAge: 3600000, // 1 hour
-      });
+     res.cookie('token', token, {
+  httpOnly: true,
+  secure: process.env.NODE_ENV === 'production',
+  sameSite: process.env.NODE_ENV === 'production' ? 'none' : 'lax',
+  maxAge: 3600000,
+});
 
       logger.info(`User logged in: ${username}`);
       res.status(200).json({ message: 'Login successful' });
