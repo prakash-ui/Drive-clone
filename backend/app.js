@@ -107,10 +107,12 @@ app.use(cookieParser());
 app.set('view engine', 'ejs');
 
 // Secure cookies in production
-if (process.env.NODE_ENV === 'production') {
+if (process.env.VITE_FRONTEND_URL === 'production') {
   app.set('trust proxy', 1); // Trust first proxy
 }
-
+app.get('/api/healthcheck', (req, res) => {
+  res.json({ status: 'ok', environment: process.env.VITE_FRONTEND_URL });
+});
 // Routes
 app.use('/api', indexRouter); // Prefix to avoid conflicts
 app.use('/api/users', userRouter); // Specific prefix for user routes

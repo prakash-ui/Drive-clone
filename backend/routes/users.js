@@ -115,6 +115,7 @@ router.post(
       const user = await userModel.findOne({ username });
       if (!user) {
         return res.status(401).json({ errors: [{ msg: 'Username or password is incorrect' }] });
+
       }
 
       const isMatch = await bcrypt.compare(password, user.password);

@@ -6,8 +6,12 @@ export default function Home() {
   const [message, setMessage] = useState('');
   const [selectedFile, setSelectedFile] = useState(null);
   const modalRef = useRef(null);
+  
+const API_URL = import.meta.env.PROD 
+  ? import.meta.env.VITE_API_URL 
+  : 'http://localhost:3000';
 
-  const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:3000';
+if (!API_URL) throw new Error('API_URL is not defined');
 
   useEffect(() => {
     // Check if the user is authenticated
