@@ -106,7 +106,7 @@ if (process.env.NODE_ENV === 'production') {
 
 // Routes
 app.use('/api/users', userRouter); // Specific prefix for user routes
-app.use('/api', indexRouter); // Prefix to avoid conflicts
+app.use('/api/files', indexRouter); // Prefix to avoid conflicts
 
 app.get('/api/healthcheck', (req, res) => {
   res.json({ 
