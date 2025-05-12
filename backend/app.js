@@ -84,7 +84,7 @@ app.use(cors({
   origin: allowedOrigins,
   credentials: true,
   methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
-  allowedHeaders: ['Content-Type', 'Authorization'],
+  allowedHeaders: ['Content-Type', 'Authorization', 'X-Requested-With'],
   optionsSuccessStatus: 200
 }));
 
@@ -103,6 +103,11 @@ app.set('view engine', 'ejs');
 if (process.env.NODE_ENV === 'production') {
   app.set('trust proxy', 1); // Trust first proxy
 }
+
+// Routes
+app.use('/api/users', userRouter); // Specific prefix for user routes
+app.use('/api', indexRouter); // Prefix to avoid conflicts
+
 app.get('/api/healthcheck', (req, res) => {
   res.json({ 
     status: 'ok',
@@ -111,9 +116,6 @@ app.get('/api/healthcheck', (req, res) => {
     dbStatus: mongoose.connection.readyState === 1 ? 'connected' : 'disconnected'
   });
 });
-// Routes
-app.use('/api', indexRouter); // Prefix to avoid conflicts
-app.use('/api/users', userRouter); // Specific prefix for user routes
 
 // 404 Handler
 app.use((req, res, next) => {

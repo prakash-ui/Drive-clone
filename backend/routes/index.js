@@ -24,7 +24,7 @@ if (process.env.NODE_ENV !== 'production') {
 }
 
 // Base API route
-router.get('/', (req, res) => {
+router.get('/status', (req, res) => {
   res.json({ message: "API is working!" });
 });
 
