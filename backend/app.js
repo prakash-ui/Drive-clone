@@ -10,6 +10,7 @@ const morgan = require('morgan');
 const cookieParser = require('cookie-parser');
 const rateLimit = require('express-rate-limit');
 const winston = require('winston');
+const mongoose = require('mongoose');
 
 
 
@@ -76,24 +77,15 @@ app.use(
 
 // CORS configuration
 const allowedOrigins = [
-  'http://localhost:5173', // Your Vite dev server
-  'https://drive-clone-c0af.onrender.com',
-  'https://drive-clone-1-lmus.onrender.com' // Production frontend
+'https://drive-clone-1-lmus.onrender.com' // Production frontend
 ];
 
 app.use(cors({
-  origin: function (origin, callback) {
-    // Allow requests with no origin (like mobile apps or curl requests)
-    if (!origin || allowedOrigins.includes(origin)) {
-      callback(null, true);
-    } else {
-      callback(new Error('Not allowed by CORS'));
-    }
-  },
+  origin: allowedOrigins,
   credentials: true,
   methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
   allowedHeaders: ['Content-Type', 'Authorization'],
-  optionsSuccessStatus: 200, // For legacy browser
+  optionsSuccessStatus: 200
 }));
 
 app.options('*', cors());

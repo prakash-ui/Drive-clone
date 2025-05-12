@@ -133,11 +133,12 @@ router.post(
         { expiresIn: '1h' }
       );
 
-     res.cookie('token', token, {
+ res.cookie('token', token, {
   httpOnly: true,
-  secure: process.env.NODE_ENV === 'production',
-  sameSite: process.env.NODE_ENV === 'production' ? 'none' : 'lax',
-  maxAge: 3600000,
+  secure: true, // Always true in production
+  sameSite: 'none', // Required for cross-site cookies
+  maxAge: 3600000, // 1 hour
+  domain: process.env.NODE_ENV === 'production' ? '.onrender.com' : undefined
 });
 
       logger.info(`User logged in: ${username}`);

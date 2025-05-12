@@ -18,11 +18,11 @@ if (!API_URL) throw new Error('API_URL is not defined');
     const checkAuth = async () => {
       try {
         const res = await fetch(`${API_URL}/api/users/check-auth`, {
-          method: 'GET',
           credentials: 'include',
         });
 
         if (!res.ok) {
+          document.cookie = 'token=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/; domain=.onrender.com;';  
           window.location.href = '/login';
         }
       } catch (err) {
