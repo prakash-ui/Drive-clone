@@ -13,28 +13,35 @@ const API_URL = import.meta.env.PROD
 
 if (!API_URL) throw new Error('API_URL is not defined');
 
-  useEffect(() => {
-    // Check if the user is authenticated
-    const checkAuth = async () => {
-      try {
-        const res = await fetch(`${API_URL}/api/users/check-auth`, {
-          credentials: 'include',
-        });
+ useEffect(() => {
+  const checkAuth = async () => {
+    try {
+      const res = await fetch(`${API_URL}/api/users/check-auth`, {
+        method: 'GET',
+        credentials: 'include', // Crucial for sending cookies
+      });
 
-        if (!res.ok) {
-          document.cookie = 'token=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/; domain=.onrender.com;';  
-          window.location.href = '/login';
-        }
-      } catch (err) {
-        console.error('Auth check error:', err);
+      console.log('Auth check response:', res.status); // Add logging
+
+      if (!res.ok) {
+        console.log('Auth failed, redirecting to login');
         window.location.href = '/login';
-      } finally {
-        setLoading(false);
+        return;
       }
-    };
 
-    checkAuth();
-  }, []);
+      const data = await res.json();
+      console.log('User data:', data); // Log user data
+      
+    } catch (err) {
+      console.error('Auth check error:', err);
+      window.location.href = '/login';
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  checkAuth();
+}, []);
 
   useEffect(() => {
     // Close modal on outside click or Escape key

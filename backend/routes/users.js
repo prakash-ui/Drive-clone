@@ -135,10 +135,10 @@ router.post(
 
 res.cookie('token', token, {
   httpOnly: true,
-  secure: true,
-  sameSite: 'none',
-  maxAge: 3600000,
-  domain: '.onrender.com' // Important for cross-service cookies
+  secure: process.env.NODE_ENV === 'production', // Only secure in production
+  sameSite: process.env.NODE_ENV === 'production' ? 'none' : 'lax', // 'none' for cross-origin in prod
+  path: '/', // Ensure cookie is available for all paths
+  maxAge: 3600000, // 1 hour
 });
 
       logger.info(`User logged in: ${username}`);
