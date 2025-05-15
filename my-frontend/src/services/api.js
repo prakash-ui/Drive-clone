@@ -12,6 +12,7 @@ const setAuthToken = (token) => {
 
 const getDefaultOptions = () => {
   const options = {
+    credentials: 'include',
     headers: {
       'Content-Type': 'application/json',
       'Accept': 'application/json'
@@ -52,8 +53,6 @@ export const api = {
       if (authHeader && authHeader.startsWith('Bearer ')) {
         const token = authHeader.split(' ')[1];
         setAuthToken(token);
-      } else if (data.token) {
-        setAuthToken(data.token);
       }
       console.log('Login successful');
       return data;
@@ -65,11 +64,6 @@ export const api = {
 
   async checkAuth() {
     try {
-      const token = getAuthToken();
-      if (!token) {
-        throw new Error('No auth token found');
-      }
-
       console.log('Checking auth at:', `${API_URL}/api/users/check-auth`);
       const options = {
         ...getDefaultOptions(),
@@ -80,19 +74,26 @@ export const api = {
       console.log('Auth check response:', {
         status: response.status,
         headers: Object.fromEntries(response.headers.entries()),
-        cookies: document.cookie
       });
       
       if (!response.ok) {
-        setAuthToken(null); // Clear token if auth check fails
+        setAuthToken(null);
         throw new Error('Not authenticated');
       }
-      
+
       const data = await response.json();
-      console.log('Auth check successful:', data);
+      
+      // Update token if a new one is provided
+      const authHeader = response.headers.get('authorization');
+      if (authHeader && authHeader.startsWith('Bearer ')) {
+        const token = authHeader.split(' ')[1];
+        setAuthToken(token);
+      }
+
       return data;
     } catch (error) {
       console.error('Auth check error:', error);
+      setAuthToken(null);
       throw error;
     }
   }
