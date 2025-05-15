@@ -76,27 +76,26 @@ app.use(
 );
 
 // CORS configuration
-const allowedOrigins = [
-  'http://localhost:5173', // Your Vite dev server
-  'https://drive-clone-b4eg.onrender.com', //backend url
-  'https://simpledrivee.netlify.app' // New Netlify frontend
-];
-
 app.use(cors({
-  origin: function (origin, callback) {
-    // Allow requests with no origin (like mobile apps or curl requests)
-    if (!origin || allowedOrigins.includes(origin)) {
-      callback(null, true);
-    } else {
-      callback(new Error('Not allowed by CORS'));
-    }
+  origin: function(origin, callback) {
+    const allowedOrigins = [
+      'http://localhost:5173',
+      'http://localhost:3000',
+      'https://drive-clone-frontend.onrender.com',
+      'https://drive-clone-frontend.netlify.app'
+    ];
+    console.log('Request origin:', origin); // Debug log
+    callback(null, allowedOrigins.includes(origin) ? origin : allowedOrigins[0]);
   },
   credentials: true,
   methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
   allowedHeaders: ['Content-Type', 'Authorization', 'Cookie'],
-  exposedHeaders: ['set-cookie'],
-  optionsSuccessStatus: 200, // For legacy browser
+  exposedHeaders: ['Set-Cookie'],
+  optionsSuccessStatus: 200
 }));
+
+// Trust proxy for secure cookies
+app.set('trust proxy', 1);
 
 // Basic middleware
 app.use(express.json());

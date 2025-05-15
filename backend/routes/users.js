@@ -138,15 +138,18 @@ router.post(
       );
 
       // Set cookie with appropriate options
-      res.cookie('token', token, {
+      const cookieOptions = {
         httpOnly: true,
-        secure: true, // Always use secure cookies
-        sameSite: 'none', // Required for cross-origin requests
+        secure: true,
+        sameSite: 'none',
         maxAge: 3600000, // 1 hour
-        path: '/' // Ensure cookie is available on all paths
-      });
-      
-      console.log('Setting auth cookie:', { token: token.substring(0, 20) + '...' }); // Debug log
+        path: '/',
+        domain: process.env.NODE_ENV === 'production' ? '.onrender.com' : 'localhost'
+      };
+
+      console.log('Setting cookie with options:', cookieOptions);
+      res.cookie('token', token, cookieOptions);
+      console.log('Cookie set. Token:', token.substring(0, 20) + '...');
 
       logger.info(`User logged in: ${username}`);
       res.status(200).json({ message: 'Login successful' });
