@@ -11,20 +11,15 @@ const setAuthToken = (token) => {
 };
 
 const getDefaultOptions = () => {
-  const options = {
+  const token = getAuthToken();
+  return {
     credentials: 'include',
     headers: {
       'Content-Type': 'application/json',
-      'Accept': 'application/json'
+      'Accept': 'application/json',
+      'Authorization': token ? `Bearer ${token}` : ''
     }
   };
-
-  const token = getAuthToken();
-  if (token) {
-    options.headers['Authorization'] = `Bearer ${token}`;
-  }
-
-  return options;
 };
 
 export const api = {
@@ -53,6 +48,7 @@ export const api = {
       if (authHeader && authHeader.startsWith('Bearer ')) {
         const token = authHeader.split(' ')[1];
         setAuthToken(token);
+        console.log('Token saved to localStorage');
       }
       console.log('Login successful');
       return data;
@@ -64,11 +60,20 @@ export const api = {
 
   async checkAuth() {
     try {
+      const token = getAuthToken();
+      console.log('Current token:', token);
       console.log('Checking auth at:', `${API_URL}/api/users/check-auth`);
+      
       const options = {
         ...getDefaultOptions(),
         method: 'GET'
       };
+      
+      console.log('Request options:', {
+        ...options,
+        headers: Object.fromEntries(Object.entries(options.headers))
+      });
+      
       const response = await fetch(`${API_URL}/api/users/check-auth`, options);
       
       console.log('Auth check response:', {
@@ -88,6 +93,7 @@ export const api = {
       if (authHeader && authHeader.startsWith('Bearer ')) {
         const token = authHeader.split(' ')[1];
         setAuthToken(token);
+        console.log('Token updated in localStorage');
       }
 
       return data;
