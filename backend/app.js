@@ -101,6 +101,12 @@ app.use(cors({
 app.options('*', cors());
 
 //Request logging
+// Debug middleware - place at top to catch all requests
+app.use((req, res, next) => {
+  console.log(`[DEBUG] ${req.method} ${req.originalUrl} - Body:`, req.body);
+  next();
+});
+
 app.use(morgan('combined', { stream: { write: (message) => logger.info(message.trim()) } }));
 
 // Middleware
@@ -133,7 +139,17 @@ app.use('/api/users', userRouter); // Specific prefix for user routes
 
 // 404 Handler
 app.use((req, res, next) => {
-  res.status(404).json({ error: 'Route not found' });
+  console.log(`[DEBUG] 404 Not Found: ${req.method} ${req.originalUrl}`);
+  res.status(404).json({ 
+    error: 'Route not found',
+    method: req.method,
+    path: req.originalUrl,
+    availableRoutes: [
+      '/api/users/login',
+      '/api/users/register',
+      '/api/users/check-auth'
+    ]
+  });
 });
 
 // Global error handler
