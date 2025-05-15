@@ -4,8 +4,10 @@ const defaultOptions = {
   credentials: 'include',
   headers: {
     'Content-Type': 'application/json',
-    'Accept': 'application/json'
-  }
+    'Accept': 'application/json',
+    'Origin': 'https://simpledrivee.netlify.app'
+  },
+  mode: 'cors'
 };
 
 /** @type {Object.<string, Function>} */
