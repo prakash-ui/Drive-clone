@@ -133,12 +133,11 @@ router.post(
         { expiresIn: '1h' }
       );
 
-res.cookie('token', token, {
+     res.cookie('token', token, {
   httpOnly: true,
-  secure: process.env.NODE_ENV === 'production', // Only secure in production
-  sameSite: process.env.NODE_ENV === 'production' ? 'none' : 'lax', // 'none' for cross-origin in prod
-  path: '/', // Ensure cookie is available for all paths
-  maxAge: 3600000, // 1 hour
+  secure: process.env.NODE_ENV === 'production',
+  sameSite: process.env.NODE_ENV === 'production' ? 'none' : 'lax',
+  maxAge: 3600000,
 });
 
       logger.info(`User logged in: ${username}`);
