@@ -78,8 +78,8 @@ app.use(
 // CORS configuration
 const allowedOrigins = [
   'http://localhost:5173', // Your Vite dev server
-  'https://drive-clone-c0af.onrender.com',
-  'https://drive-clone-1-lmus.onrender.com' // Production frontend
+  'https://drive-clone-b4eg.onrender.com', //backend url
+  'https://simpledrivee.netlify.app' // New Netlify frontend
 ];
 
 app.use(cors({
@@ -93,7 +93,8 @@ app.use(cors({
   },
   credentials: true,
   methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
-  allowedHeaders: ['Content-Type', 'Authorization'],
+  allowedHeaders: ['Content-Type', 'Authorization', 'Cookie'],
+  exposedHeaders: ['set-cookie'],
   optionsSuccessStatus: 200, // For legacy browser
 }));
 

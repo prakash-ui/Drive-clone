@@ -144,7 +144,11 @@ router.post(
       res.status(200).json({ message: 'Login successful' });
     } catch (error) {
       logger.error(`Login error: ${error.message}`);
-      res.status(500).json({ errors: [{ msg: 'Server error' }] });
+      console.error('Full login error:', error);
+      res.status(500).json({ 
+        errors: [{ msg: 'Server error' }],
+        debug: process.env.NODE_ENV !== 'production' ? error.message : undefined
+      });
     }
   }
 );
