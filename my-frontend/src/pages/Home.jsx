@@ -12,13 +12,17 @@ export default function Home() {
     const checkAuth = async () => {
       try {
         const data = await api.checkAuth();
-        // setUser(data.user); // commented out as setUser is not defined
+        console.log('Auth check successful:', data); // Debug log
+        if (!data.authenticated) {
+          throw new Error('Not authenticated');
+        }
       } catch (error) {
         console.error('Auth check failed:', error);
+        // Use navigate instead of window.location for better SPA behavior
         window.location.href = '/login';
-      } finally {
-        setLoading(false);
+        return; // Exit early to prevent setting loading to false
       }
+      setLoading(false);
     };
 
     checkAuth();
