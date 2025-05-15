@@ -1,9 +1,0 @@
-[build]
-  base = "my-frontend"  # Netlify will automatically cd here
-  command = "npm install && npm run build"  # Remove the cd command
-  publish = "dist"  # Relative to base directory
-
-[[redirects]]
-  from = "/*"
-  to = "/index.html"
-  status = 200
