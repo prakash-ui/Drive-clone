@@ -1,4 +1,5 @@
 import { useEffect, useState, useRef } from 'react';
+import { api } from '../services/api';
 
 export default function Home() {
   const [showPopup, setShowPopup] = useState(false);
@@ -6,25 +7,14 @@ export default function Home() {
   const [message, setMessage] = useState('');
   const [selectedFile, setSelectedFile] = useState(null);
   const modalRef = useRef(null);
-  
-const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:3000';
-
-if (!API_URL) throw new Error('API_URL is not defined');
 
   useEffect(() => {
-    // Check if the user is authenticated
     const checkAuth = async () => {
       try {
-        const res = await fetch(`${API_URL}/api/users/check-auth`, {
-          method: 'GET',
-          credentials: 'include',
-        });
-
-        if (!res.ok) {
-          window.location.href = '/login';
-        }
-      } catch (err) {
-        console.error('Auth check error:', err);
+        const data = await api.checkAuth();
+        // setUser(data.user); // commented out as setUser is not defined
+      } catch (error) {
+        console.error('Auth check failed:', error);
         window.location.href = '/login';
       } finally {
         setLoading(false);
