@@ -1,7 +1,9 @@
 import { useEffect, useState, useRef } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { api } from '../services/api';
 
 export default function Home() {
+  const navigate = useNavigate();
   const [showPopup, setShowPopup] = useState(false);
   const [loading, setLoading] = useState(true);
   const [message, setMessage] = useState('');
@@ -11,22 +13,26 @@ export default function Home() {
   useEffect(() => {
     const checkAuth = async () => {
       try {
+        console.log('Checking auth...');
         const data = await api.checkAuth();
-        console.log('Auth check successful:', data); // Debug log
+        console.log('Auth check response:', data);
+        
         if (!data.authenticated) {
-          throw new Error('Not authenticated');
+          console.log('Not authenticated, redirecting to login');
+          navigate('/login');
+          return;
         }
+        
+        console.log('Authentication successful');
+        setLoading(false);
       } catch (error) {
         console.error('Auth check failed:', error);
-        // Use navigate instead of window.location for better SPA behavior
-        window.location.href = '/login';
-        return; // Exit early to prevent setting loading to false
+        navigate('/login');
       }
-      setLoading(false);
     };
 
     checkAuth();
-  }, []);
+  }, [navigate]);
 
   useEffect(() => {
     // Close modal on outside click or Escape key

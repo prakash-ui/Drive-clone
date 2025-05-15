@@ -1,25 +1,37 @@
 const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:3000';
 
-const getAuthToken = () => localStorage.getItem('token');
+const getAuthToken = () => {
+  const token = localStorage.getItem('token');
+  console.log('Retrieved token from localStorage:', token);
+  return token;
+};
 
 const setAuthToken = (token) => {
   if (token) {
+    console.log('Setting token in localStorage:', token);
     localStorage.setItem('token', token);
   } else {
+    console.log('Removing token from localStorage');
     localStorage.removeItem('token');
   }
 };
 
 const getDefaultOptions = () => {
   const token = getAuthToken();
-  return {
+  const options = {
     credentials: 'include',
     headers: {
       'Content-Type': 'application/json',
-      'Accept': 'application/json',
-      'Authorization': token ? `Bearer ${token}` : ''
+      'Accept': 'application/json'
     }
   };
+
+  if (token) {
+    options.headers['Authorization'] = `Bearer ${token}`;
+  }
+
+  console.log('Request options:', options);
+  return options;
 };
 
 export const api = {
@@ -43,13 +55,15 @@ export const api = {
         throw new Error(error.errors?.[0]?.msg || error.message || 'Login failed');
       }
       
-      const data = await response.json();
       const authHeader = response.headers.get('authorization');
       if (authHeader && authHeader.startsWith('Bearer ')) {
         const token = authHeader.split(' ')[1];
         setAuthToken(token);
-        console.log('Token saved to localStorage');
+      } else {
+        console.warn('No authorization header in login response');
       }
+      
+      const data = await response.json();
       console.log('Login successful');
       return data;
     } catch (error) {

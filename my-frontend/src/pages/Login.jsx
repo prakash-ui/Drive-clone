@@ -1,7 +1,9 @@
 import { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { api } from '../services/api';
 
 export default function Login() {
+  const navigate = useNavigate();
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
 
@@ -11,11 +13,12 @@ export default function Login() {
     setLoading(true);
 
     try {
-      await api.login(
+      const response = await api.login(
         e.target.username.value,
         e.target.password.value
       );
-      window.location.href = '/';
+      console.log('Login successful:', response);
+      navigate('/');
     } catch (err) {
       setError(err.message || 'Login failed');
       console.error('Login error:', err);
