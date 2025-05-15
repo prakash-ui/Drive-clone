@@ -121,6 +121,12 @@ app.get('/api/healthcheck', (req, res) => {
     dbStatus: mongoose.connection.readyState === 1 ? 'connected' : 'disconnected'
   });
 });
+// Debug middleware
+app.use((req, res, next) => {
+  console.log(`[DEBUG] ${req.method} ${req.url}`);
+  next();
+});
+
 // Routes
 app.use('/api', indexRouter); // Prefix to avoid conflicts
 app.use('/api/users', userRouter); // Specific prefix for user routes

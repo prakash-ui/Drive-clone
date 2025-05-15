@@ -104,6 +104,10 @@ router.post(
     body('password').trim().isLength({ min: 5 }).withMessage('Password must be at least 5 characters long'),
     body('username').trim().isLength({ min: 3 }).withMessage('Username must be at least 3 characters long'),
   ],
+  (req, res, next) => {
+    console.log('[DEBUG] Login attempt:', { username: req.body.username });
+    next();
+  },
   async (req, res) => {
     const errors = validationResult(req);
     if (!errors.isEmpty()) {
