@@ -98,27 +98,39 @@ app.use(cors({
   optionsSuccessStatus: 200, // For legacy browser
 }));
 
+// Basic middleware
+app.use(express.json());
+app.use(express.urlencoded({ extended: true }));
+app.use(cookieParser());
+app.use(morgan('combined', { stream: { write: (message) => logger.info(message.trim()) } }));
+
+// CORS setup
 app.options('*', cors());
 
-//Request logging
-// Debug middleware - place at top to catch all requests
+// Debug middleware
 app.use((req, res, next) => {
   console.log(`[DEBUG] ${req.method} ${req.originalUrl} - Body:`, req.body);
   next();
 });
 
-app.use(morgan('combined', { stream: { write: (message) => logger.info(message.trim()) } }));
-
-// Middleware
-app.use(express.json());
-app.use(express.urlencoded({ extended: true }));
-app.use(cookieParser());
-app.set('view engine', 'ejs');
-
 // Secure cookies in production
 if (process.env.NODE_ENV === 'production') {
-  app.set('trust proxy', 1); // Trust first proxy
+  app.set('trust proxy', 1);
 }
+
+// Root route handler
+app.get('/', (req, res) => {
+  res.json({
+    message: 'Welcome to Drive Clone API',
+    availableRoutes: [
+      '/api/users/login',
+      '/api/users/register',
+      '/api/users/check-auth'
+    ]
+  });
+});
+
+// Health check
 app.get('/api/healthcheck', (req, res) => {
   res.json({ 
     status: 'ok',
@@ -127,15 +139,10 @@ app.get('/api/healthcheck', (req, res) => {
     dbStatus: mongoose.connection.readyState === 1 ? 'connected' : 'disconnected'
   });
 });
-// Debug middleware
-app.use((req, res, next) => {
-  console.log(`[DEBUG] ${req.method} ${req.url}`);
-  next();
-});
 
-// Routes
-app.use('/api', indexRouter); // Prefix to avoid conflicts
-app.use('/api/users', userRouter); // Specific prefix for user routes
+// API Routes
+app.use('/api', indexRouter);
+app.use('/api/users', userRouter);
 
 // 404 Handler
 app.use((req, res, next) => {
