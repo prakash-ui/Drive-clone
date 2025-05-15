@@ -140,16 +140,27 @@ router.post(
       // Set cookie with appropriate options
       const cookieOptions = {
         httpOnly: true,
-        secure: true,
-        sameSite: 'none',
+        secure: true, // Always use secure cookies
+        sameSite: 'none', // Required for cross-origin
         maxAge: 3600000, // 1 hour
         path: '/',
-        domain: process.env.NODE_ENV === 'production' ? '.onrender.com' : 'localhost'
+        domain: process.env.NODE_ENV === 'production' ? '.onrender.com' : undefined
       };
 
-      console.log('Setting cookie with options:', cookieOptions);
+      console.log('Setting auth cookie with options:', cookieOptions);
       res.cookie('token', token, cookieOptions);
-      console.log('Cookie set. Token:', token.substring(0, 20) + '...');
+
+      // Also set the token in the Authorization header
+      res.setHeader('Authorization', `Bearer ${token}`);
+
+      // Set a session indicator cookie (not httpOnly, so JavaScript can read it)
+      res.cookie('session_active', 'true', {
+        ...cookieOptions,
+        httpOnly: false
+      });
+
+      console.log('Response headers:', res.getHeaders());
+      console.log('Login successful for:', username);
 
       logger.info(`User logged in: ${username}`);
       res.status(200).json({ message: 'Login successful' });

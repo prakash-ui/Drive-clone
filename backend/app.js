@@ -76,26 +76,44 @@ app.use(
 );
 
 // CORS configuration
-app.use(cors({
-  origin: function(origin, callback) {
-    const allowedOrigins = [
-      'http://localhost:5173',
-      'http://localhost:3000',
-      'https://drive-clone-frontend.onrender.com',
-      'https://drive-clone-frontend.netlify.app'
-    ];
-    console.log('Request origin:', origin); // Debug log
-    callback(null, allowedOrigins.includes(origin) ? origin : allowedOrigins[0]);
-  },
-  credentials: true,
-  methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
-  allowedHeaders: ['Content-Type', 'Authorization', 'Cookie'],
-  exposedHeaders: ['Set-Cookie'],
-  optionsSuccessStatus: 200
-}));
+app.use((req, res, next) => {
+  const origin = req.headers.origin;
+  console.log('Request origin:', origin);
+
+  // Set CORS headers
+  res.header('Access-Control-Allow-Origin', origin || 'https://simpledrivee.netlify.app');
+  res.header('Access-Control-Allow-Credentials', 'true');
+  res.header('Access-Control-Allow-Methods', 'GET,HEAD,PUT,PATCH,POST,DELETE');
+  res.header('Access-Control-Allow-Headers', 'Origin, X-Requested-With, Content-Type, Accept, Authorization, Cookie');
+  res.header('Access-Control-Expose-Headers', 'Set-Cookie');
+
+  // Handle preflight
+  if (req.method === 'OPTIONS') {
+    return res.status(200).end();
+  }
+
+  next();
+});
 
 // Trust proxy for secure cookies
-app.set('trust proxy', 1);
+app.enable('trust proxy');
+
+// Add request logging middleware
+app.use((req, res, next) => {
+  console.log(`[${req.method}] ${req.path}`);
+  console.log('Headers:', req.headers);
+  next();
+});
+
+// Add response logging middleware
+app.use((req, res, next) => {
+  const originalSend = res.send;
+  res.send = function(body) {
+    console.log('Response headers:', res.getHeaders());
+    return originalSend.call(this, body);
+  };
+  next();
+});
 
 // Basic middleware
 app.use(express.json());

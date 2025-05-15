@@ -1,9 +1,5 @@
-// @ts-check
-
-/** @type {string} */
 const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:3000';
 
-/** @type {RequestInit} */
 const defaultOptions = {
   credentials: 'include',
   headers: {
@@ -17,7 +13,6 @@ export const api = {
   async login(username, password) {
     try {
       console.log('Attempting login to:', `${API_URL}/api/users/login`);
-      /** @type {RequestInit} */
       const options = {
         ...defaultOptions,
         method: 'POST',
@@ -50,7 +45,6 @@ export const api = {
       console.log('Checking auth at:', `${API_URL}/api/users/check-auth`);
       console.log('Current cookies:', document.cookie);
       
-      /** @type {RequestInit} */
       const options = {
         ...defaultOptions,
         method: 'GET'
