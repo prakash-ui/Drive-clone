@@ -57,13 +57,18 @@ export const api = {
 
       console.log('Uploading file:', file.name);
       const response = await fetch(`${API_URL}/api/files/upload`, options);
-
-      if (!response.ok) {
-        const error = await response.json();
-        throw new Error(error.message || 'Failed to upload file');
-      }
+      
+      console.log('Upload response:', {
+        status: response.status,
+        ok: response.ok,
+        headers: Object.fromEntries(response.headers.entries())
+      });
 
       const data = await response.json();
+      if (!response.ok) {
+        throw new Error(data.error || 'Failed to upload file');
+      }
+
       console.log('Upload successful:', data);
       return data;
     } catch (error) {

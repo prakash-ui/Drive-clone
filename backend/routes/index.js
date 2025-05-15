@@ -46,17 +46,34 @@ router.get('/home', authMiddleware, (req, res) => {
 });
 
 // POST Upload File (Protected route)
-router.post('/files/upload', authMiddleware, uploadLimiter, upload.single('file'), (req, res) => {
-  if (!req.file) {
-    return res.status(400).json({ error: 'No file uploaded' });
-  }
+router.post('/files/upload', authMiddleware, uploadLimiter, upload.single('file'), async (req, res) => {
+  try {
+    if (!req.file) {
+      return res.status(400).json({ error: 'No file uploaded' });
+    }
 
-  logger.info(`File uploaded by user ${req.user.userId}: ${req.file.filename}`);
-  
-  res.status(200).json({
-    message: 'File uploaded successfully',
-    filePath: `/uploads/${req.file.filename}`
-  });
+    // Upload to Supabase
+    const result = await uploadToSupabase(req.file);
+    if (!result) {
+      return res.status(500).json({ error: 'Failed to upload file to storage' });
+    }
+
+    logger.info(`File uploaded by user ${req.user.userId}: ${result.filePath}`);
+
+    res.status(200).json({
+      message: 'File uploaded successfully',
+      file: {
+        name: req.file.originalname,
+        type: req.file.mimetype,
+        size: req.file.size,
+        url: result.publicURL,
+        path: result.filePath
+      }
+    });
+  } catch (error) {
+    logger.error('Upload error:', error);
+    res.status(500).json({ error: 'Server error during upload' });
+  }
 });
 
 module.exports = router;
