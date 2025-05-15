@@ -1,28 +1,30 @@
 import { defineConfig } from 'vite';
 import react from '@vitejs/plugin-react';
-import tailwindcss from 'tailwindcss';
 
-export default defineConfig(({ command }) => ({
-  plugins: [react(), tailwindcss()],
-  
-  // Base URL (critical for production)
-  base: command === 'serve' ? '' : '/', 
-
-  // Production build settings
+/** @type {import('vite').UserConfig} */
+const config = {
+  plugins: [react()],
+  base: '/',
   build: {
-    outDir: './dist', // Output to backend's public folder
+    outDir: 'dist',
     emptyOutDir: true,
-    sourcemap: true // Helpful for debugging
+    sourcemap: true
   },
-
-  // Dev server proxy (avoids CORS during development)
   server: {
+    port: 5173,
+    strictPort: true,
+    cors: true,
     proxy: {
       '/api': {
-        target: 'https://drive-clone-c0af.onrender.com', // Your backend URL
+        target: 'https://drive-clone-b4eg.onrender.com',
         changeOrigin: true,
         secure: false
       }
     }
+  },
+  resolve: {
+    extensions: ['.mjs', '.js', '.jsx', '.json']
   }
-}));
+};
+
+export default defineConfig(config);

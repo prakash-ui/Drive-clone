@@ -1,5 +1,9 @@
+// @ts-check
+
+/** @type {string} */
 const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:3000';
 
+/** @type {Object.<string, Function>} */
 export const api = {
   async login(username, password) {
     const response = await fetch(`${API_URL}/api/users/login`, {
