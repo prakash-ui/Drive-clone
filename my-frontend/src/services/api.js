@@ -17,20 +17,25 @@ const setAuthToken = (token) => {
 };
 
 const getDefaultOptions = () => {
-  const token = getAuthToken();
   const options = {
-    credentials: 'include',
+    credentials: 'include', // Always include credentials
     headers: {
       'Content-Type': 'application/json',
       'Accept': 'application/json'
     }
   };
 
+  // Get token from localStorage
+  const token = getAuthToken();
   if (token) {
     options.headers['Authorization'] = `Bearer ${token}`;
   }
 
-  console.log('Request options:', options);
+  console.log('Request options:', {
+    ...options,
+    headers: { ...options.headers }
+  });
+  
   return options;
 };
 
@@ -55,16 +60,18 @@ export const api = {
         throw new Error(error.errors?.[0]?.msg || error.message || 'Login failed');
       }
       
+      // First get the token from the Authorization header
       const authHeader = response.headers.get('authorization');
       if (authHeader && authHeader.startsWith('Bearer ')) {
         const token = authHeader.split(' ')[1];
         setAuthToken(token);
+        console.log('Token saved from Authorization header');
       } else {
         console.warn('No authorization header in login response');
       }
       
       const data = await response.json();
-      console.log('Login successful');
+      console.log('Login successful, response:', data);
       return data;
     } catch (error) {
       console.error('Login error:', error);
@@ -83,16 +90,20 @@ export const api = {
         method: 'GET'
       };
       
-      console.log('Request options:', {
-        ...options,
-        headers: Object.fromEntries(Object.entries(options.headers))
+      console.log('Auth check request:', {
+        url: `${API_URL}/api/users/check-auth`,
+        options: {
+          ...options,
+          headers: { ...options.headers }
+        }
       });
       
       const response = await fetch(`${API_URL}/api/users/check-auth`, options);
       
       console.log('Auth check response:', {
         status: response.status,
-        headers: Object.fromEntries(response.headers.entries()),
+        ok: response.ok,
+        headers: Object.fromEntries(response.headers.entries())
       });
       
       if (!response.ok) {
@@ -101,13 +112,14 @@ export const api = {
       }
 
       const data = await response.json();
+      console.log('Auth check data:', data);
       
       // Update token if a new one is provided
       const authHeader = response.headers.get('authorization');
       if (authHeader && authHeader.startsWith('Bearer ')) {
         const token = authHeader.split(' ')[1];
         setAuthToken(token);
-        console.log('Token updated in localStorage');
+        console.log('Token refreshed from server');
       }
 
       return data;
@@ -116,5 +128,5 @@ export const api = {
       setAuthToken(null);
       throw error;
     }
-  }
+  },
 };
