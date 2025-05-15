@@ -118,6 +118,12 @@ if (process.env.NODE_ENV === 'production') {
   app.set('trust proxy', 1);
 }
 
+// Debug middleware
+app.use((req, res, next) => {
+  logger.info(`Incoming request: ${req.method} ${req.url}`);
+  next();
+});
+
 // Routes
 app.use('/api/users', userRouter);
 app.use('/api/files', indexRouter);
