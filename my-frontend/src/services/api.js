@@ -1,22 +1,37 @@
 const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:3000';
 
-const defaultOptions = {
-  credentials: 'include',
-  headers: {
-    'Content-Type': 'application/json',
-    'Accept': 'application/json',
-    'Origin': 'https://simpledrivee.netlify.app'
-  },
-  mode: 'cors'
+const getAuthToken = () => localStorage.getItem('token');
+
+const setAuthToken = (token) => {
+  if (token) {
+    localStorage.setItem('token', token);
+  } else {
+    localStorage.removeItem('token');
+  }
 };
 
-/** @type {Object.<string, Function>} */
+const getDefaultOptions = () => {
+  const options = {
+    headers: {
+      'Content-Type': 'application/json',
+      'Accept': 'application/json'
+    }
+  };
+
+  const token = getAuthToken();
+  if (token) {
+    options.headers['Authorization'] = `Bearer ${token}`;
+  }
+
+  return options;
+};
+
 export const api = {
   async login(username, password) {
     try {
       console.log('Attempting login to:', `${API_URL}/api/users/login`);
       const options = {
-        ...defaultOptions,
+        ...getDefaultOptions(),
         method: 'POST',
         body: JSON.stringify({ username, password })
       };
@@ -24,8 +39,7 @@ export const api = {
       
       console.log('Login response:', {
         status: response.status,
-        headers: Object.fromEntries(response.headers.entries()),
-        cookies: document.cookie
+        headers: Object.fromEntries(response.headers.entries())
       });
       
       if (!response.ok) {
@@ -34,7 +48,14 @@ export const api = {
       }
       
       const data = await response.json();
-      console.log('Login successful:', data);
+      const authHeader = response.headers.get('authorization');
+      if (authHeader && authHeader.startsWith('Bearer ')) {
+        const token = authHeader.split(' ')[1];
+        setAuthToken(token);
+      } else if (data.token) {
+        setAuthToken(data.token);
+      }
+      console.log('Login successful');
       return data;
     } catch (error) {
       console.error('Login error:', error);
@@ -44,11 +65,14 @@ export const api = {
 
   async checkAuth() {
     try {
+      const token = getAuthToken();
+      if (!token) {
+        throw new Error('No auth token found');
+      }
+
       console.log('Checking auth at:', `${API_URL}/api/users/check-auth`);
-      console.log('Current cookies:', document.cookie);
-      
       const options = {
-        ...defaultOptions,
+        ...getDefaultOptions(),
         method: 'GET'
       };
       const response = await fetch(`${API_URL}/api/users/check-auth`, options);
@@ -60,8 +84,8 @@ export const api = {
       });
       
       if (!response.ok) {
-        const error = await response.json();
-        throw new Error(error.error || 'Authentication check failed');
+        setAuthToken(null); // Clear token if auth check fails
+        throw new Error('Not authenticated');
       }
       
       const data = await response.json();
