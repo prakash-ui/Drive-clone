@@ -36,8 +36,8 @@ const uploadLimiter = rateLimit({
 
 // GET Home (Protected route)
 router.get('/home', authMiddleware, (req, res) => {
-  res.status(200).json({ 
-    message: 'Welcome to the homepage', 
+  res.status(200).json({
+    message: 'Welcome to the homepage',
     user: {
       userId: req.user.userId,
       username: req.user.username
@@ -52,7 +52,7 @@ router.post('/files/upload', authMiddleware, uploadLimiter, upload.single('file'
   }
 
   logger.info(`File uploaded by user ${req.user.userId}: ${req.file.filename}`);
-  
+
   res.status(200).json({
     message: 'File uploaded successfully',
     filePath: `/uploads/${req.file.filename}`
