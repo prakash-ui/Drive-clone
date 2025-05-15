@@ -1,0 +1,20 @@
+services:
+  - type: web
+    name: drive-clone-backend
+    env: node
+    buildCommand: npm install
+    startCommand: node app.js
+    nodeVersion: 18.x
+    envVars:
+      - key: NODE_ENV
+        value: production
+
+  - type: web
+    name: drive-clone-frontend
+    env: node
+    buildCommand: npm install && npm run build
+    startCommand: npm run preview
+    nodeVersion: 18.x
+    envVars:
+      - key: NODE_ENV
+        value: production

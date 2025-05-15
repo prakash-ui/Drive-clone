@@ -62,6 +62,8 @@ app.use(cookieParser());
 const allowedOrigins = [
   'https://drive-clone-1-lmus.onrender.com',
   'http://localhost:5173',
+  'https://drive-clone-1.onrender.com',
+  'https://drive-clone-1-lmus.onrender.com'
 ];
 
 app.use(

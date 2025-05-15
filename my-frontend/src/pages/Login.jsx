@@ -6,6 +6,7 @@ export default function Login() {
   const API_URL = import.meta.env.VITE_API_URL ||'http://localhost:3000';
 
   const handleSubmit = async (e) => {
+    console.log('API URL:', API_URL);
     e.preventDefault();
     setError('');
     setLoading(true);
