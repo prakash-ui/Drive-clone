@@ -84,26 +84,14 @@ export default function Home() {
       return;
     }
 
-    const formData = new FormData();
-    formData.append('file', selectedFile);
-
     try {
-      const res = await fetch(`${API_URL}/api/files/upload`, {
-        method: 'POST',
-        body: formData,
-        credentials: 'include',
-      });
-
-      const data = await res.json();
-      if (res.ok) {
-        setMessage('File uploaded successfully!');
-        setSelectedFile(null);
-        setTimeout(() => setShowPopup(false), 2000);
-      } else {
-        setMessage(data.error || 'Failed to upload file.');
-      }
-    } catch (err) {
-      setMessage('Server error. Please check if the backend is running.');
+      await api.uploadFile(selectedFile);
+      setMessage('File uploaded successfully!');
+      setSelectedFile(null);
+      setTimeout(() => setShowPopup(false), 2000);
+    } catch (error) {
+      console.error('Upload failed:', error);
+      setMessage(error.message || 'Failed to upload file. Please try again.');
     }
   };
 

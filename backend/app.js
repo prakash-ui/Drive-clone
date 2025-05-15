@@ -3,6 +3,7 @@ const dotenv = require('dotenv');
 dotenv.config();
 const userRouter = require('./routes/users');
 const indexRouter = require('./routes/index');
+const filesRouter = require('./routes/files');
 const cors = require('cors');
 const helmet = require('helmet');
 const compression = require('compression');
@@ -164,8 +165,9 @@ app.get('/api/healthcheck', (req, res) => {
 });
 
 // API Routes
-app.use('/api', indexRouter);
+app.use('/', indexRouter);
 app.use('/api/users', userRouter);
+app.use('/api/files', filesRouter);
 
 // 404 Handler
 app.use((req, res, next) => {

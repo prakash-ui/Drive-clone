@@ -40,6 +40,38 @@ const getDefaultOptions = () => {
 };
 
 export const api = {
+  async uploadFile(file) {
+    try {
+      const formData = new FormData();
+      formData.append('file', file);
+
+      const options = {
+        ...getDefaultOptions(),
+        method: 'POST',
+        body: formData,
+        // Remove Content-Type header to let browser set it with boundary for FormData
+        headers: {
+          'Accept': 'application/json'
+        }
+      };
+
+      console.log('Uploading file:', file.name);
+      const response = await fetch(`${API_URL}/api/files/upload`, options);
+
+      if (!response.ok) {
+        const error = await response.json();
+        throw new Error(error.message || 'Failed to upload file');
+      }
+
+      const data = await response.json();
+      console.log('Upload successful:', data);
+      return data;
+    } catch (error) {
+      console.error('Upload error:', error);
+      throw error;
+    }
+  },
+
   async login(username, password) {
     try {
       console.log('Attempting login to:', `${API_URL}/api/users/login`);
