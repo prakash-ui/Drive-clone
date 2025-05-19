@@ -163,7 +163,7 @@ router.post(
       console.log('Login successful for:', username);
 
       logger.info(`User logged in: ${username}`);
-      res.status(200).json({ message: 'Login successful' });
+      res.status(200).json({ message: 'Login successful' ,token});
     } catch (error) {
       logger.error(`Login error: ${error.message}`);
       console.error('Full login error:', error);

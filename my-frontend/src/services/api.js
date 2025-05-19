@@ -45,13 +45,18 @@ export const api = {
       const formData = new FormData();
       formData.append('file', file);
 
+      const token = getAuthToken();
+      if (!token) {
+        throw new Error('Authentication required');
+      }
+
       const options = {
-        ...getDefaultOptions(),
         method: 'POST',
         body: formData,
-        // Remove Content-Type header to let browser set it with boundary for FormData
+        credentials: 'include',
         headers: {
-          'Accept': 'application/json'
+          'Accept': 'application/json',
+          'Authorization': `Bearer ${token}`
         }
       };
 
@@ -97,18 +102,26 @@ export const api = {
         throw new Error(error.errors?.[0]?.msg || error.message || 'Login failed');
       }
       
-      // First get the token from the Authorization header
-      const authHeader = response.headers.get('authorization');
-      if (authHeader && authHeader.startsWith('Bearer ')) {
-        const token = authHeader.split(' ')[1];
-        setAuthToken(token);
-        console.log('Token saved from Authorization header');
-      } else {
-        console.warn('No authorization header in login response');
-      }
-      
       const data = await response.json();
       console.log('Login successful, response:', data);
+      
+      // Get token from response data
+      if (data.token) {
+        setAuthToken(data.token);
+        console.log('Token saved from response data');
+      } else {
+        // Fallback to Authorization header
+        const authHeader = response.headers.get('authorization');
+        if (authHeader && authHeader.startsWith('Bearer ')) {
+          const token = authHeader.split(' ')[1];
+          setAuthToken(token);
+          console.log('Token saved from Authorization header');
+        } else {
+          console.warn('No token found in response');
+          throw new Error('No authentication token received');
+        }
+      }
+      
       return data;
     } catch (error) {
       console.error('Login error:', error);
